@@ -123,7 +123,7 @@
                 </div>
                 <div class="weather-details">
                     <div class="weather-detail"><strong>Температура:</strong> <?php echo number_format($server->getTemperature(), 1); ?>°C</div>
-                    <div class="weather-detail"><strong>Погода:</strong> <?php echo htmlspecialchars($server->getCondition()); ?></div>
+                    <div class="weather-detail"><strong>Погода:</strong> <?php echo htmlspecialchars($server->getWeatherCondition()); ?></div>
                     <div class="weather-detail"><strong>Ветер:</strong> <?php echo number_format($server->getWindSpeed(), 1); ?> м/с</div>
                     <div class="weather-detail"><strong>Влажность:</strong> <?php echo $server->getHumidity(); ?>%</div>
                 </div>
@@ -139,7 +139,7 @@
                 .then(data => {
                     let logContent = 'Лог изменений для сервера ' + serverId + ':\n\n';
                     data.forEach(log => {
-                        logContent += `${log.timestamp} - T:${log.temperature}°C, ${log.condition}, Ветер:${log.wind_speed}м/с, Влажность:${log.humidity}%\n`;
+                        logContent += `${log.timestamp} - T:${log.temperature}°C, ${log.weather_condition}, Ветер:${log.wind_speed}м/с, Влажность:${log.humidity}%\n`;
                     });
                     alert(logContent);
                 })
