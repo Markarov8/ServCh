@@ -20,7 +20,7 @@ spl_autoload_register('autoload');
 
 // Роутинг
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$method = $_SERVER['METHOD'];
+$method = $_SERVER['REQUEST_METHOD'];
 $request_uri = ltrim($request_uri, '/');
 $parts = explode('/', $request_uri);
 
