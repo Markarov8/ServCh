@@ -174,6 +174,9 @@
                 <label for="userSelect">Пользователь:</label>
                 <select id="userSelect" onchange="location.href='/user/' + this.value;">
                     <option value="">Выберите пользователя</option>
+                    <?php foreach ($users as $user): ?>
+                    <option value="<?php echo $user->getId(); ?>"><?php echo htmlspecialchars($user->getName()); ?></option>
+                    <?php endforeach; ?>
                 </select>
                 <button onclick="showAddUserForm()">+ Добавить игрока</button>
             </div>
