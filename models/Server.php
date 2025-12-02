@@ -1,0 +1,40 @@
+<?php
+
+class Server {
+    private $id;
+    private $name;
+    private $temperature;
+    private $weatherCondition;
+    private $windSpeed;
+    private $humidity;
+    private $timestamp;
+    
+    public function __construct($id = null, $name = '', $temperature = 0, $weatherCondition = '', $windSpeed = 0, $humidity = 0, $timestamp = null) {
+        $this->id = $id;
+        $this->name = $name;
+        $this->temperature = $temperature;
+        $this->weatherCondition = $weatherCondition;
+        $this->windSpeed = $windSpeed;
+        $this->humidity = $humidity;
+        $this->timestamp = $timestamp;
+    }
+    
+    // Геттеры
+    public function getId() { return $this->id; }
+    public function getName() { return $this->name; }
+    public function getTemperature() { return $this->temperature; }
+    public function getWeatherCondition() { return $this->weatherCondition; }
+    public function getWindSpeed() { return $this->windSpeed; }
+    public function getHumidity() { return $this->humidity; }
+    public function getTimestamp() { return $this->timestamp; }
+    
+    // Сеттеры
+    public function setId($id) { $this->id = $id; }
+    public function setName($name) { $this->name = $name; }
+    public function setTemperature($temperature) { $this->temperature = $temperature; }
+    public function setWeatherCondition($weatherCondition) { $this->weatherCondition = $weatherCondition; }
+    public function setWindSpeed($windSpeed) { $this->windSpeed = $windSpeed; }
+    public function setHumidity($humidity) { $this->humidity = $humidity; }
+    public function setTimestamp($timestamp) { $this->timestamp = $timestamp; }
+}
+?>
