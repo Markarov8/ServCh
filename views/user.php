@@ -75,6 +75,11 @@
             color: #343a40;
         }
 
+        .server-time {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
         .log-button {
             background-color: #6c757d;
             color: white;
@@ -114,12 +119,15 @@
             <div class="user-name"><?php echo htmlspecialchars($userObj->getName()); ?></div>
         </div>
         
-        <div class="servers-grid">
+        <div class="servers-grid" id="serversGrid">
             <?php foreach ($servers as $server): ?>
-            <div class="server-item">
+            <div class="server-item" id="server-<?php echo $server->getId(); ?>">
                 <div class="server-header">
-                    <div class="server-name"><?php echo htmlspecialchars($server->getName()); ?></div>
-                    <button class="log-button" onclick="showLog(<?php echo $server->getId(); ?>)">i</button>
+                    <div>
+                        <div class="server-name"><?php echo htmlspecialchars($server->getName()); ?></div>
+                        <div class="server-time" id="time-<?php echo $server->getId(); ?>">--:--</div>
+                    </div>
+                    <a href="/log/<?php echo $server->getId(); ?>" class="log-button" target="_blank">i</a>
                 </div>
                 <div class="weather-details">
                     <div class="weather-detail"><strong>Температура:</strong> <?php echo number_format($server->getTemperature(), 1); ?>°C</div>
@@ -133,18 +141,34 @@
     </div>
 
     <script>
-        function showLog(serverId) {
-            fetch('/log/' + serverId)
-                .then(response => response.json())
-                .then(data => {
-                    let logContent = 'Лог изменений для сервера ' + serverId + ':\n\n';
-                    data.forEach(log => {
-                        logContent += `${log.timestamp} - T:${log.temperature}°C, ${log.weather_condition}, Ветер:${log.wind_speed}м/с, Влажность:${log.humidity}%\n`;
-                    });
-                    alert(logContent);
-                })
-                .catch(error => console.error('Ошибка:', error));
+        function updateServerTimes() {
+            const now = new Date();
+            const timeString = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            
+            <?php foreach ($servers as $server): ?>
+            document.getElementById('time-<?php echo $server->getId(); ?>').textContent = timeString;
+            <?php endforeach; ?>
         }
+
+        // Обновляем время каждую минуту
+        setInterval(updateServerTimes, 60000);
+        updateServerTimes();
+
+        // Автоматическое обновление данных у игрока
+        setInterval(() => {
+            fetch(window.location.href)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newGrid = doc.getElementById('serversGrid');
+                    if (newGrid) {
+                        document.getElementById('serversGrid').innerHTML = newGrid.innerHTML;
+                        updateServerTimes();
+                    }
+                })
+                .catch(error => console.error('Ошибка обновления:', error));
+        }, 10000);
     </script>
 </body>
 </html>
