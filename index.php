@@ -28,9 +28,27 @@ $controller = 'AdminController';
 $action = 'dashboard';
 $params = [];
 
-// Главная страница
-if (empty($parts[0])) {} 
-
+if (empty($parts[0])) {
+    // Проверяем наличие ошибки в GET-параметрах
+    if (isset($_GET['error'])) {
+        $errorMessage = '';
+        switch ($_GET['error']) {
+            case 'temperature':
+                $errorMessage = 'Температура должна быть в пределах от -55 до 55.';
+                break;
+            case 'wind':
+                $errorMessage = 'Ветер должен быть быть в пределах от 0 до 45.';
+                break;
+            case 'humidity':
+                $errorMessage = 'Влажность должна быть в пределах от 0 до 100%.';
+                break;
+        }
+        if ($errorMessage) {
+            echo '<script>alert("' . addslashes($errorMessage) . '"); window.location.href = "/";</script>';
+            exit;
+        }
+    }
+} 
 elseif ($parts[0] === 'server') {
     if (isset($parts[1])) {
         switch ($parts[1]) {
