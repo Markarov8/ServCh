@@ -40,7 +40,25 @@ class AdminController {
             $temp = (float)($_POST['temperature'] ?? 0);
             $weather_condition = trim($_POST['weather_condition'] ?? '');
             $wind = (float)($_POST['wind'] ?? 0);
-            $humidity = (float)($_POST['humidity'] ?? 0);
+            $humidity = (int)($_POST['humidity'] ?? 0);
+            
+            // Проверка температуры
+            if (!is_numeric($_POST['temperature']) || $temp < -55 || $temp > 55) {
+                header('Location: /?error=temperature');
+                exit;
+            }
+            
+            // Проверка ветра
+            if (!is_numeric($_POST['wind']) || $wind < 0 || $wind > 45) {
+                header('Location: /?error=wind');
+                exit;
+            }
+            
+            // Проверка влажности
+            if ($humidity < 0 || $humidity > 100) {
+                header('Location: /?error=humidity');
+                exit;
+            }
             
             if ($serverId > 0) {
                 require_once __DIR__ . '/../config/database.php';
@@ -84,7 +102,7 @@ class AdminController {
                     $newTemp = $current['temperature'] + (mt_rand(-30, 30) / 10);
                     $newWind = max(0, $current['wind_speed'] + (mt_rand(-20, 20) / 10));
                     $newHumidity = max(0, min(100, $current['humidity'] + mt_rand(-10, 10)));
-                    $conditions = ['sunny', 'cloudy', 'rainy', 'stormy', 'foggy'];
+                    $conditions = ['sunny', 'cloudy', 'rainy', 'stormy', 'snowy', 'foggy'];
                     $newCondition = $conditions[array_rand($conditions)];
                     
                     // Обновляем погоду
@@ -198,7 +216,7 @@ class AdminController {
             SELECT * FROM weather_logs 
             WHERE server_id = ? 
             ORDER BY timestamp DESC 
-            LIMIT 20
+            LIMIT 50
         ");
         $stmt->execute([$serverId]);
         $logs = [];
@@ -215,9 +233,7 @@ class AdminController {
         }
         
         // Логи
-        header('Content-Type: application/json');
-        echo json_encode($logs);
-        exit;
+        include __DIR__ . '/../views/log.php';
     }
 }
 ?>
