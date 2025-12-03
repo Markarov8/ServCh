@@ -78,6 +78,12 @@
             color: #343a40;
         }
 
+        .server-time {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
         .weather-details {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -111,7 +117,7 @@
             color: #6c757d;
         }
 
-        .form-group input {
+        .form-group input, .form-group select {
             padding: 6px;
             border: 1px solid #ced4da;
             border-radius: 4px;
@@ -125,11 +131,11 @@
         }
 
         .btn-update {
-            background-color: #28a745;
+            background-color: #00a048ff;
         }
 
         .btn-generate {
-            background-color: #ffc107;
+            background-color: #ff9a15ff;
             color: #212529;
         }
 
@@ -178,9 +184,9 @@
                     <option value="<?php echo $user->getId(); ?>"><?php echo htmlspecialchars($user->getName()); ?></option>
                     <?php endforeach; ?>
                 </select>
-                <button onclick="showAddUserForm()">+ Добавить игрока</button>
+                <button onclick="showAddUserForm()">Добавить пользователя</button>
             </div>
-            <button onclick="showAddServerForm()">+ Добавить сервер</button>
+            <button onclick="showAddServerForm()">Добавить сервер</button>
         </div>
         
         <div id="addUserForm" class="add-user-form" style="display:none;">
@@ -210,7 +216,7 @@
         <?php foreach ($servers as $server): ?>
         <div class="server-card">
             <div class="weather-info">
-                <h3><?php echo htmlspecialchars($server->getName()); ?></h3>
+                <h3><?php echo htmlspecialchars($server->getName()); ?> <span class="server-time" id="time-<?php echo $server->getId(); ?>">--:--</span></h3>
                 <div class="weather-details">
                     <div class="weather-detail"><strong>Температура:</strong> <?php echo number_format($server->getTemperature(), 1); ?>°C</div>
                     <div class="weather-detail"><strong>Погода:</strong> <?php echo htmlspecialchars($server->getWeatherCondition()); ?></div>
@@ -225,28 +231,35 @@
                     
                     <div class="form-group">
                         <label>Температура (°C):</label>
-                        <input type="number" name="temperature" step="0.1" value="<?php echo $server->getTemperature(); ?>" required>
+                        <input type="number" name="temperature" min="-55" max="55" step="0.1" value="<?php echo $server->getTemperature(); ?>" required>
                     </div>
                     
                     <div class="form-group">
                         <label>Погода:</label>
-                        <input type="text" name="weather_condition" value="<?php echo htmlspecialchars($server->getWeatherCondition()); ?>" required>
+                        <select name="weather_condition" required>
+                            <option value="sunny" <?php echo $server->getWeatherCondition() === 'sunny' ? 'selected' : ''; ?>>Солнечно</option>
+                            <option value="cloudy" <?php echo $server->getWeatherCondition() === 'cloudy' ? 'selected' : ''; ?>>Облачно</option>
+                            <option value="rainy" <?php echo $server->getWeatherCondition() === 'rainy' ? 'selected' : ''; ?>>Дождь</option>
+                            <option value="stormy" <?php echo $server->getWeatherCondition() === 'stormy' ? 'selected' : ''; ?>>Шторм</option>
+                            <option value="snowy" <?php echo $server->getWeatherCondition() === 'snowy' ? 'selected' : ''; ?>>Снег</option>
+                            <option value="foggy" <?php echo $server->getWeatherCondition() === 'foggy' ? 'selected' : ''; ?>>Туман</option>
+                        </select>
                     </div>
                     
                     <div class="form-group">
                         <label>Ветер (м/с):</label>
-                        <input type="number" name="wind" step="0.1" value="<?php echo $server->getWindSpeed(); ?>" required>
+                        <input type="number" name="wind" min="0" max="45" step="0.1" value="<?php echo $server->getWindSpeed(); ?>" required>
                     </div>
                     
                     <div class="form-group">
                         <label>Влажность (%):</label>
-                        <input type="number" name="humidity" value="<?php echo $server->getHumidity(); ?>" required>
+                        <input type="number" name="humidity" min="0" max="100" value="<?php echo $server->getHumidity(); ?>" required>
                     </div>
                     
                     <div class="form-actions">
                         <button type="submit" class="btn-update">Сохранить</button>
                         <button type="button" class="btn-generate" onclick="generateWeather(<?php echo $server->getId(); ?>)">Случайно</button>
-                        <button type="button" class="btn-log" onclick="showLog(<?php echo $server->getId(); ?>)">Лог</button>
+                        <button href="/log/<?php echo $server->getId(); ?>" class="btn-log">Лог</button>
                     </div>
                 </form>
             </div>
@@ -284,18 +297,34 @@
             form.submit();
         }
         
-        function showLog(serverId) {
-            fetch('/log/' + serverId)
-                .then(response => response.json())
-                .then(data => {
-                    let logContent = 'Лог изменений для сервера ' + serverId + ':\n\n';
-                    data.forEach(log => {
-                        logContent += `${log.timestamp} - T:${log.temperature}°C, ${log.weather_condition}, Ветер:${log.wind_speed}м/с, Влажность:${log.humidity}%\n`;
-                    });
-                    alert(logContent);
-                })
-                .catch(error => console.error('Ошибка:', error));
+        // Функция обновления времени
+        function updateServerTimes() {
+            const now = new Date();
+            const timeString = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            
+            // Обновляем время для каждого сервера
+            <?php foreach ($servers as $server): ?>
+            document.getElementById('time-<?php echo $server->getId(); ?>').textContent = timeString;
+            <?php endforeach; ?>
         }
+
+        // Обновляем время каждую минуту
+        setInterval(updateServerTimes, 60000);
+        updateServerTimes();
+
+        // Автоматическая генерация погоды
+        setInterval(() => {
+            <?php foreach ($servers as $server): ?>
+                fetch('/server/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'server_id=<?php echo $server->getId(); ?>'
+                })
+            <?php endforeach; ?>
+            location.reload();
+        }, 10000);
     </script>
 </body>
 </html>
