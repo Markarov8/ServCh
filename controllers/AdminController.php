@@ -99,11 +99,17 @@ class AdminController {
                 
                 if ($current) {
                     // Генерация значений
-                    $newTemp = $current['temperature'] + (mt_rand(-30, 30) / 10);
-                    $newWind = max(0, $current['wind_speed'] + (mt_rand(-20, 20) / 10));
+                    $newTemp = max(-55, min(55, $current['temperature'] + (mt_rand(-30, 30) / 10)));
+                    $newWind = max(0, min(45, $current['wind_speed'] + (mt_rand(-20, 20) / 10)));
                     $newHumidity = max(0, min(100, $current['humidity'] + mt_rand(-10, 10)));
-                    $conditions = ['sunny', 'cloudy', 'rainy', 'stormy', 'snowy', 'foggy'];
-                    $newCondition = $conditions[array_rand($conditions)];
+                    if ($newTemp < -2){
+                        $conditions = ['sunny', 'cloudy', 'snowstormy', 'snowy', 'foggy'];
+                        $newCondition = $conditions[array_rand($conditions)];
+                    }
+                    else{
+                        $conditions = ['sunny', 'cloudy', 'rainy', 'stormy', 'foggy'];
+                        $newCondition = $conditions[array_rand($conditions)];
+                    }
                     
                     // Обновляем погоду
                     $stmt = $db->prepare("
