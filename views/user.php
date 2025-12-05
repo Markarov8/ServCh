@@ -83,12 +83,10 @@
         .log-button {
             background-color: #6c757d;
             color: white;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-            font-size: 0.8rem;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
         }
 
         .weather-details {
@@ -127,7 +125,7 @@
                         <div class="server-name"><?php echo htmlspecialchars($server->getName()); ?></div>
                         <div class="server-time" id="time-<?php echo $server->getId(); ?>">--:--</div>
                     </div>
-                    <a href="/log/<?php echo $server->getId(); ?>" class="log-button" target="_blank">i</a>
+                    <a href="/log/<?php echo $server->getId(); ?>" class="log-button" target="_blank">Лог</a>
                 </div>
                 <div class="weather-details">
                     <div class="weather-detail"><strong>Температура:</strong> <?php echo number_format($server->getTemperature(), 1); ?>°C</div>

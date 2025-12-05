@@ -139,8 +139,13 @@
             color: #212529;
         }
 
-        .btn-log {
+        .log-button {
             background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 0.9rem;
         }
 
         .add-server-form {
@@ -159,6 +164,16 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
         @media (max-width: 768px) {
             .server-card {
                 flex-direction: column;
@@ -175,6 +190,13 @@
 </head>
 <body>
     <div class="container">
+        <?php if (isset($error_message)): ?>
+            <div class="error-message"><?php echo htmlspecialchars($error_message); ?></div>
+        <?php endif; ?>
+        <?php if (isset($not_found_message)): ?>
+            <div class="error-message"><?php echo htmlspecialchars($not_found_message); ?></div>
+        <?php endif; ?>
+
         <div class="header">
             <div class="user-selector">
                 <label for="userSelect">Пользователь:</label>
@@ -259,7 +281,7 @@
                     <div class="form-actions">
                         <button type="submit" class="btn-update">Сохранить</button>
                         <button type="button" class="btn-generate" onclick="generateWeather(<?php echo $server->getId(); ?>)">Случайно</button>
-                        <button href="/log/<?php echo $server->getId(); ?>" class="btn-log">Лог</button>
+                        <a href="/log/<?php echo $server->getId(); ?>" class="log-button" target="_blank">Лог</a>
                     </div>
                 </form>
             </div>
