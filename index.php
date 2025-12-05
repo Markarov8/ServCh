@@ -27,26 +27,34 @@ $parts = explode('/', $request_uri);
 $controller = 'AdminController';
 $action = 'dashboard';
 $params = [];
+$errorMessage = null;
+$notFoundMessage = null;
 
 if (empty($parts[0])) {
     // Проверяем наличие ошибки в GET-параметрах
     if (isset($_GET['error'])) {
-        $errorMessage = '';
         switch ($_GET['error']) {
             case 'temperature':
                 $errorMessage = 'Температура должна быть в пределах от -55 до 55.';
                 break;
             case 'wind':
-                $errorMessage = 'Ветер должен быть быть в пределах от 0 до 45.';
+                $errorMessage = 'Ветер должен быть в пределах от 0 до 45.';
                 break;
             case 'humidity':
                 $errorMessage = 'Влажность должна быть в пределах от 0 до 100%.';
                 break;
+            case 'not_found_user':
+                $notFoundMessage = 'Пользователь не найден.';
+                break;
+            case 'not_found_server':
+                $notFoundMessage = 'Сервер не найден.';
+                break;
         }
-        if ($errorMessage) {
-            echo '<script>alert("' . addslashes($errorMessage) . '"); window.location.href = "/";</script>';
-            exit;
-        }
+    }
+    // Передача ошибок в dashboard
+    if ($errorMessage || $notFoundMessage) {
+        $params = [$errorMessage, $notFoundMessage];
+        $action = 'dashboardWithError';
     }
 } 
 elseif ($parts[0] === 'server') {

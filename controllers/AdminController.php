@@ -2,7 +2,7 @@
 
 class AdminController {
     
-    public function dashboard() {
+    public function dashboard($errorMessage = null, $notFoundMessage = null) { // Принимаем сообщения
         require_once __DIR__ . '/../config/database.php';
         require_once __DIR__ . '/../models/Server.php';
         require_once __DIR__ . '/../models/User.php';
@@ -30,8 +30,15 @@ class AdminController {
         while ($row = $stmt->fetch()) {
             $users[] = new User($row['id'], $row['name']);
         }
+
+        $error_message = $errorMessage;
+        $not_found_message = $notFoundMessage;
         
         include __DIR__ . '/../views/dashboard.php';
+    }
+    
+    public function dashboardWithError($errorMessage, $notFoundMessage) {
+        $this->dashboard($errorMessage, $notFoundMessage);
     }
     
     public function updateUserWeather() {
@@ -171,7 +178,7 @@ class AdminController {
         $user = $stmt->fetch();
         
         if (!$user) {
-            header('Location: /');
+            header('Location: /?error=not_found_user');
             exit;
         }
         
@@ -218,6 +225,13 @@ class AdminController {
         
         $db = Database::getInstance()->getConnection();
         
+        $stmt = $db->prepare("SELECT id FROM servers WHERE id = ?");
+        $stmt->execute([$serverId]);
+        if (!$stmt->fetch()) {
+            header('Location: /?error=not_found_server');
+            exit;
+        }
+
         $stmt = $db->prepare("
             SELECT * FROM weather_logs 
             WHERE server_id = ? 
@@ -238,7 +252,7 @@ class AdminController {
             );
         }
         
-        // Логи
+        
         include __DIR__ . '/../views/log.php';
     }
 }
