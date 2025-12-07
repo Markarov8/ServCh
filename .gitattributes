@@ -1,5 +1,5 @@
-views/*.php linguist-language=HTML
-views/admin/*.php linguist-language=HTML
+docker-compose.yml linguist-language=Dockerfile
+init.sql linguist-language=sql
 
 README.md linguist-detectable=false
 
