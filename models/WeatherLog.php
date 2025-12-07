@@ -36,5 +36,29 @@ class WeatherLog {
     public function setWindSpeed($windSpeed) { $this->windSpeed = $windSpeed; }
     public function setHumidity($humidity) { $this->humidity = $humidity; }
     public function setTimestamp($timestamp) { $this->timestamp = $timestamp; }
+
+    public static function getLatestForServer($serverId, $limit = 50) {
+        $db = Database::getInstance()->getConnection();
+        $stmt = $db->prepare("
+            SELECT * FROM weather_logs 
+            WHERE server_id = ? 
+            ORDER BY timestamp DESC 
+            LIMIT ?
+        ");
+        $stmt->execute([$serverId, $limit]);
+        $logs = [];
+        while ($row = $stmt->fetch()) {
+            $logs[] = new WeatherLog(
+                $row['id'],
+                $row['server_id'],
+                $row['temperature'],
+                $row['weather_condition'],
+                $row['wind_speed'],
+                $row['humidity'],
+                $row['timestamp']
+            );
+        }
+        return $logs;
+    }
 }
 ?>
