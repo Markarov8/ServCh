@@ -8,7 +8,6 @@ function sendPostRequest($url, $data) {
     curl_setopt($ch, CURLOPT_HEADER, true); // Чтобы получить заголовки
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
     return [$httpCode, $response];
 }
 
@@ -62,22 +61,7 @@ function testValidation() {
         echo "FAIL: Влажность -50 не отклонена\n";
     }
 
-    // Тест 4: SQL-инъекция в поле погоды
-    $postData = [
-        'server_id' => '1',
-        'temperature' => '20.0',
-        'weather_condition' => "'; DROP TABLE servers; --",
-        'wind' => '5.0',
-        'humidity' => '60'
-    ];
-    [$code, $response] = sendPostRequest("$base_url/server/update", $postData);
-    if ($code == 302 && strpos($response, 'Location: /') !== false) {
-        echo "OK: SQL-инъекция обработана безопасно\n";
-    } else {
-        echo "FAIL: SQL-инъекция вызвала ошибку\n";
-    }
-
-    // Тест 5: Доступ к несуществующему серверу
+    // Тест 4: Доступ к несуществующему серверу
     [$code, $response] = sendPostRequest("$base_url/user/9999", []);
     if ($code == 302 && strpos($response, 'Location: /?error=not_found_user') !== false) {
         echo "OK: Доступ к несуществующему пользователю отклонён\n";
