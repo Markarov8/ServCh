@@ -49,6 +49,7 @@
 2. Запустите проект с помощью Docker Compose:
    ```bash
    docker-compose up --build
+   php -S localhost:7070
    ```
 
 3. Откройте в браузере: `http://localhost:7070`
