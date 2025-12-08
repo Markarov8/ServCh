@@ -36,7 +36,8 @@
 ## Установка и запуск
 
 ### Требования
-- Docker  
+- Docker
+- PHP in PATH (Windows)
 
 ### Шаги
 
